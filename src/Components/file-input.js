@@ -28,7 +28,7 @@ const FileInput = (props) => {
 
   useEffect(() => {
     props.onFileChange(file);
-  }, [file]);
+  }, [file, props]);
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {

@@ -7,7 +7,10 @@ import {
   IconButton,
   Stack,
 } from "@mui/material";
+
 import Dialog from "@mui/material/Dialog";
+import { createWorker } from 'tesseract.js';
+
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -23,6 +26,7 @@ function FileConverter({ pdfUrl, fileName }) {
   const [imageUrls, setImageUrls] = useState([]);
   const [numOfPages, setNumOfPages] = useState(0);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [textOCR, setText] = useState("");
 
   useEffect(() => {
     setLoading(false);
@@ -38,7 +42,7 @@ function FileConverter({ pdfUrl, fileName }) {
     setOpen(false);
   };
 
-  const UrlUploader = (url) => {
+  const UrlUploader = useMemo(() => (url) => {
     fetch(url).then((response) => {
       response.blob().then((blob) => {
         let reader = new FileReader();
@@ -49,15 +53,19 @@ function FileConverter({ pdfUrl, fileName }) {
         reader.readAsDataURL(blob);
       });
     });
-  };
+  }, []);
 
   useMemo(() => {
     UrlUploader(pdfUrl);
-  }, []);
+  }, [UrlUploader, pdfUrl]);
 
   const renderPage = async (data) => {
     setLoading(true);
+
+    const worker = await createWorker('por');
+
     const imagesList = [];
+    const textList = [];
     const canvas = document.createElement("canvas");
     canvas.setAttribute("className", "canv");
     const pdf = await pdfjsLib.getDocument({ data }).promise;
@@ -73,14 +81,20 @@ function FileConverter({ pdfUrl, fileName }) {
       await page.render(render_context).promise;
       let img = canvas.toDataURL("image/png");
       imagesList.push(img);
+
+      const ret = await worker.recognize(img);
+      textList.push(ret.data.text);
     }
     setNumOfPages((e) => e + pdf.numPages);
     setImageUrls((e) => [...e, ...imagesList]);
+    setText(textList.join("\n"))
+
+    await worker.terminate();
   };
 
   useEffect(() => {
     myRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [imageUrls]);
+  }, [imageUrls, myRef]);
 
   const downloadImage = (url, index) => {
     const a = document.createElement("a");
@@ -103,6 +117,12 @@ function FileConverter({ pdfUrl, fileName }) {
               <h4 className="drop-file-preview__title">
                 Converted Images - {numOfPages}
               </h4>
+
+              <h4 className="drop-file-preview__title">
+                <Box component="section" sx={{ p: 2, border: '1px dashed grey' }} className="drop-file-preview__title">
+                  {textOCR}
+                </Box>
+              </h4>             
               <Grid container spacing={3}>
                 {imageUrls.map((url, index) => (
                   <Grid item xs={12} sm={4} key={index}>
