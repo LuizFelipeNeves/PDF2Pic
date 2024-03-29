@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/PDF2Pic/static/css/main.4afb21b8.css",
+    "main.js": "/PDF2Pic/static/js/main.645a6600.js",
+    "static/js/787.126e3de5.chunk.js": "/PDF2Pic/static/js/787.126e3de5.chunk.js",
+    "service-worker.js": "/PDF2Pic/service-worker.js",
+    "index.html": "/PDF2Pic/index.html",
+    "main.4afb21b8.css.map": "/PDF2Pic/static/css/main.4afb21b8.css.map",
+    "main.645a6600.js.map": "/PDF2Pic/static/js/main.645a6600.js.map",
+    "787.126e3de5.chunk.js.map": "/PDF2Pic/static/js/787.126e3de5.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.4afb21b8.css",
+    "static/js/main.645a6600.js"
+  ]
+}
